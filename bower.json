@@ -1,0 +1,36 @@
+{
+  "name": "counter",
+  "description": "",
+  "main": "index.js",
+  "authors": [
+    "DmitryShamak <hellkitedmitry@mail.ru>"
+  ],
+  "license": "ISC",
+  "moduleType": [],
+  "homepage": "",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "lodash": "~4.0.1",
+    "angular": "~1.4.8",
+    "bootstrap": "~3.3.6",
+    "font-awesome": "fontawesome#~4.5.0",
+    "ng-websocket": "~0.2.1",
+    "moment": "~2.11.1",
+    "jquery": "~2.2.0",
+    "numeral": "~1.5.3",
+    "angular-ui-router": "~0.2.15",
+    "less": "~2.5.3",
+    "animate.css": "~3.5.1",
+    "ng-dialog": "~0.5.6",
+    "angular-resource": "~1.4.9",
+    "underscore": "~1.8.3",
+    "satellizer": "~0.13.4",
+    "auth0-angular": "~4.1.0"
+  }
+}

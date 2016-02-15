@@ -1,0 +1,17 @@
+<div navigation></div>
+<div class="page-wrapper animated fadeIn clearfix">
+	<div class="row" ng-hide="pageParams.busy">
+		<div class="col-xs-12">
+			<h3>Your history</h3>
+		</div>
+		<div class="col-xs-12" ng-hide="pageParams.offline">
+			<ul class="alert links" ng-hide="!userHistory || !userHistory.length">
+				<li class="link-wrapper" ng-repeat="link in userHistory | filter:{'type': 'board'}  track by $index">
+					<p><a ui-sref="join({id: link.key})" ng-bind="link.title"></a></p>
+				</li>
+			</ul>
+			<p ng-hide="userHistory && userHistory.length" class="alert alert-info">Where you've been before?</p>
+		</div>
+	</div>
+	<p class="form-group alert alert-info" ng-hide="!pageParams.busy"><i class="fa fa-refresh fa-pulse"></i> in progress..</p>
+</div>

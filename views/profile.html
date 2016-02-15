@@ -1,0 +1,33 @@
+<div navigation></div>
+<div class="page-wrapper animated fadeIn clearfix">
+    <div class="row" ng-hide="pageParams.busy">
+        <div class="col-xs-12">
+            <h3>Your Profile</h3>
+        </div>
+        <div class="col-xs-12 clearfix" ng-hide="pageParams.offline">
+            <form class="form col-xs-12" ng-model="userProfile" ng-submit="updateProfile(userProfile);">
+                <div class="row form-group">
+                    <div class="col-xs-12 col-md-6">
+                        <input type="text" class="form-control" ng-model="userProfile.name" disabled="disabled" placeholder="Name" />
+                    </div>
+                    <div class="col-xs-12 col-md-6"><input type="text" class="form-control" ng-model="userProfile.lastname" placeholder="Last Name" /></div>
+                </div>
+                <div class="row form-group">
+                    <div class="col-xs-12 col-md-6"><input type="date" class="form-control" ng-model="userProfile.dob" placeholder="Day of Birth" /></div>
+                    <div class="col-xs-12 col-md-6"><input type="text" class="form-control" ng-model="userProfile.address" placeholder="Address" /></div>
+                </div>
+                <div class="row form-group">
+                    <div class="col-xs-12 col-md-6"><input type="text" class="form-control" ng-model="userProfile.email" placeholder="Email" /></div>
+                    <div class="col-xs-12 col-md-6"><input type="text" class="form-control" ng-model="userProfile.phone" placeholder="Phone Number" /></div>
+                </div>
+                <div class="row form-group">
+                    <div class="col-xs-12">
+                        <button class="btn btn-primary">Save Changes</button>
+                        <div class="btn btn-warning" ng-click="resetChanges();">Reset Changes</div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <p class="form-group alert alert-info" ng-hide="!pageParams.busy"><i class="fa fa-refresh fa-pulse"></i> in progress..</p>
+</div>

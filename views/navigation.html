@@ -1,0 +1,21 @@
+<div class="navigation-wrapper">
+	<div class="navigation-list">
+		<div class="navigation-group">
+			<div class="navigation-link user-profile btn"
+			   ui-sref="profile" ui-sref-active="selected" title="profile: {{user.name}}">
+				<i class="profile-icon fa fa-user"></i>
+			</div>
+		</div>
+		<div class="navigation-group">
+			<div ng-repeat="link in navigation.topLinks track by $index">
+				<div navigation-link="link"></div>
+			</div>
+		</div>
+
+		<div class="navigation-group bottom-group">
+			<div ng-repeat="link in navigation.bottomLinks track by $index">
+				<div navigation-link="link"></div>
+			</div>
+		</div>
+	</div>
+</div>

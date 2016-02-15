@@ -1,0 +1,26 @@
+<div class="col-xs-8 col-xs-offset-1 col-md-4 col-md-offset-4">
+	<h3 class="">Sign in</h3>
+	<form class="form sign-in" ng-submit="signIn(userData);">
+		<div class="row form-group">
+			<div class="col-xs-12" ng-class="{'has-error': !userData.name}">
+				<input type="text" class="form-control" ng-model="userData.name" placeholder="Name" />
+			</div>
+		</div>
+		<div class="row form-group">
+			<div class="col-xs-12 col-md-6" ng-class="{'has-error': !userData.password}">
+				<input type="password" class="form-control" ng-model="userData.password" placeholder="Password" />
+			</div>
+			<div class="col-xs-12 col-md-6" ng-class="{'has-error': !userData.password || (userData.cpassword && userData.password != userData.cpassword)}">
+				<input type="password" class="form-control" ng-model="userData.cpassword" placeholder="Confirm Password" />
+			</div>
+		</div>
+
+		<p class="form-group alert alert-danger" ng-hide="!invalid">Invalid data.</p>
+		<p class="form-group alert alert-info" ng-hide="!busy || invalid"><i class="fa fa-refresh fa-pulse"></i> in progress..</p>
+
+		<div class="row form-group text-center" ng-hide="busy">
+			<button class="col-xs-12 col-md-4 col-md-offset-1 btn btn-warning">Sign In</button>
+			<div class="col-xs-12 col-md-4 col-md-offset-1 btn btn-danger" ui-sref="login">Cancel</div>
+		</div>
+	</form>
+</div>

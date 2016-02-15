@@ -1,0 +1,10 @@
+<div>
+	<h4>Do you want increase number to <b>{{data.count + increaseParams.value}}</b> ?</h4>
+	<form class="form-group">
+		<input type="number" class="form-control" placeholder="Value" ng-model="increaseParams.value" />
+	</form>
+	<div class="clearfix">
+		<div class="btn btn-warning" ng-click="onConfirm(data);">Confirm</div>
+		<div class="btn btn-danger" ng-click="onCancel();">Cancel</div>
+	</div>
+</div>
