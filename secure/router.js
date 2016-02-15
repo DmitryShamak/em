@@ -15,12 +15,12 @@ var router = function(app) {
     app.use(passport.initialize());
     app.use(passport.session());
 
-    app.get('/auth/google', passport.authenticate("google", {scope: ['profile', 'email']}));
-    app.get('/auth/google/callback', passport.authenticate("google", {
-            successRedirect: "/sources",
-            failureRedirect: "/sources"
-        })
-    );
+    //app.get('/auth/google', passport.authenticate("google", {scope: ['profile', 'email']}));
+    //app.get('/auth/google/callback', passport.authenticate("google", {
+    //        successRedirect: "/sources",
+    //        failureRedirect: "/sources"
+    //    })
+    //);
 };
 
 module.exports = router;

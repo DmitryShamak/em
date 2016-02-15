@@ -62,9 +62,7 @@ function config($stateProvider, $urlRouterProvider, $locationProvider) {
 angular
   .module('app')
   .config(config)
-  .run(function($rootScope, $state, $injector, $location, auth) {
-    auth.hookEvents();
-
+  .run(function($rootScope, $state, $injector, $location) {
     $rootScope.getToken = function() {
         var cookie = document.cookie.split(";");
         var token;

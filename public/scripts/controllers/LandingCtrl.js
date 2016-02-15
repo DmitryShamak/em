@@ -16,7 +16,6 @@ angular.module("app")
 			api.user.get({
 				name: $scope.user.name
 			}, function(user) {
-				$scope.userHistory = user.history;
 				$scope.pageParams.busy = false;
 			}, function(error) {
 				$scope.pageParams.busy = false;

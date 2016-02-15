@@ -69,9 +69,7 @@ function config($stateProvider, $urlRouterProvider, $locationProvider) {
 angular
   .module('app')
   .config(config)
-  .run(function($rootScope, $state, $injector, $location, auth) {
-    auth.hookEvents();
-
+  .run(function($rootScope, $state, $injector, $location) {
     $rootScope.getToken = function() {
         var cookie = document.cookie.split(";");
         var token;
@@ -140,7 +138,6 @@ angular.module("app")
 			api.user.get({
 				name: $scope.user.name
 			}, function(user) {
-				$scope.userHistory = user.history;
 				$scope.pageParams.busy = false;
 			}, function(error) {
 				$scope.pageParams.busy = false;
@@ -181,11 +178,7 @@ angular.module("app")
 		};
 	});
 angular.module("app")
-	.controller("NavigationCtrl", function($scope, scoreboardDialog) {
-		$scope.createScoreboard = function() {
-			scoreboardDialog.show();
-		};
-
+	.controller("NavigationCtrl", function($scope) {
 		$scope.updateNotificationCount = function() {
 			$scope.notificationsCount = 0;
 		};
@@ -199,26 +192,15 @@ angular.module("app")
 				value: $scope.notificationsCount || 0
 		};
 		topLinks.sources = {
-			title: "Sources",
-			state: "sources",
-			icon: "fa-external-link",
-			value: $scope.sourcesCount || 0
-		};
-		topLinks.news = {
-			title: "News",
-			state: "news",
-			icon: "fa-newspaper-o",
-			value: $scope.newsCount || 0
+			title: "Map",
+			state: "map",
+			icon: "fa-map-marker",
+			value: $scope.mewMarkers || 0
 		};
 
 		$scope.navigation.topLinks = topLinks;
 
 		var bottomLinks = {};
-		bottomLinks.scoreboard = {
-			title: "Create New Scoreboard",
-			icon: "fa-plus-square",
-			action: $scope.createScoreboard
-		};
 
 		bottomLinks.logout = {
 			title: "Log Out",
