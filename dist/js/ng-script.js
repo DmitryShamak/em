@@ -36,7 +36,7 @@ function config($stateProvider, $urlRouterProvider, $locationProvider) {
           },
           controller: function($rootScope, $state) {
             $rootScope.user = null;
-            document.cookie = null;
+            document.cookie = "expired";
             $state.go("login");
           }
         })
@@ -56,6 +56,14 @@ function config($stateProvider, $urlRouterProvider, $locationProvider) {
             },
             controller: "ProfileCtrl"
         })
+        .state('map', {
+            url: "/map",
+            templateUrl: "/views/map.html",
+            data: {
+                pageTitle: 'My Map'
+            },
+            controller: "MapCtrl"
+        })
         .state('join', {
           url: "/join/:id",
           templateUrl: "/views/scoreboard.html",
@@ -69,15 +77,9 @@ function config($stateProvider, $urlRouterProvider, $locationProvider) {
 angular
   .module('app')
   .config(config)
-  .run(function($rootScope, $state, $injector, $location) {
+  .run(function($rootScope, $state, $window, $location) {
     $rootScope.getToken = function() {
-        var cookie = document.cookie.split(";");
-        var token;
-        _.forEach(cookie, function(item) {
-            if(item.charAt(0) == ' ') {
-                token = item.substring(1);
-            }
-        });
+        return $.cookie("user");
 
         return token;
     };
@@ -88,27 +90,17 @@ angular
 
     $rootScope.checkAuthentication = function() {
         if(!$rootScope.user) {
-            $rootScope.busy = false;
-            var api = $injector.get('api');
             var token = $rootScope.getToken();
             if(!token) {
-                $state.go("login");
+                return $state.go("login");
             }
-            $rootScope.busy = true;
-            api.authenticate.save({token: token}, function(user) {
-                $rootScope.user = user;
-                var state = $state.current.name;
-
-                if(state === "login") {
-                    $rootScope.redirectToMainPage();
-                } else {
-                    $state.go(state);
-                }
-                $rootScope.busy = false;
-            }, function(err) {
-                $state.go("login");
-                $rootScope.busy = false;
-            });
+            $rootScope.user = JSON.parse(token);
+            var state = $state.current.name || $window.location.pathname.substring(1);
+            if(!state || state === "login") {
+                $window.location.href = "/landing";
+            } else {
+                $state.go(state);
+            }
         }
     };
 
@@ -126,7 +118,46 @@ angular.module("app")
 	      $state.go("login");
 	    }
 
+		var dateNow = moment().toDate();
+
 		$scope.pageParams = {};
+		$scope.pageData = {};
+
+		$scope.initStats = function(stats) {
+			$scope.pageData.stats = [];
+			$scope.pageData.stats.push({
+				priority: 0,
+				data: {
+					count: 0,
+					title: "News",
+					date: dateNow
+				}
+			});
+			$scope.pageData.stats.push({
+				priority: 1,
+				data: {
+					count: 0,
+					title: "Events",
+					date: dateNow
+				}
+			});
+			$scope.pageData.stats.push({
+				priority: 2,
+				data: {
+					count: 0,
+					title: "Messages",
+					date: dateNow
+				}
+			});
+			$scope.pageData.stats.push({
+				priority: 3,
+				data: {
+					count: 0,
+					title: "Notifications",
+					date: dateNow
+				}
+			});
+		};
 
 		$scope.init = function() {
 			$scope.pageParams.busy = true;
@@ -134,6 +165,8 @@ angular.module("app")
 			if(!$scope.user) {
 				return;
 			}
+
+			$scope.initStats({});
 
 			api.user.get({
 				name: $scope.user.name
@@ -149,8 +182,22 @@ angular.module("app")
 	});
 
 angular.module("app")
-	.controller("LogInCtrl", function($rootScope, $scope, $state, api) {
-		$scope.userData = {};
+	.controller("LogInCtrl", function($rootScope, $scope, $state, $window, api) {
+		$scope.sources = [{
+			name: "Google+",
+			key: "google"
+		}, {
+			name: "Instagram",
+			key: "instagram"
+		}, {
+			name: "Facebook",
+			key: "facebook"
+		}];
+
+		$scope.authWith = function(source) {
+			var path = "/auth/" + source;
+			$window.location.href = path;
+		};
 		
 		$scope.logIn = function(userData) {
 			if($scope.busy) {
@@ -176,6 +223,72 @@ angular.module("app")
 				$scope.busy = false;
 			});
 		};
+	});
+angular.module("app")
+	.controller("MapCtrl", function($rootScope, $scope, $state, api) {
+		$scope.pageParams = {};
+		$scope.pageData = {};
+
+		$scope.initMap = function(pos) {
+			var customMapType = new google.maps.StyledMapType([
+				{
+					stylers: [
+						{hue: '#0077ff'},
+						{visibility: 'simplified'},
+						{gamma: 0.5},
+						{saturation: -90},
+						{weight: 0.5}
+					]
+				},
+				{
+					//elementType: 'labels',
+					//stylers: [{visibility: 'off'}]
+				},
+				{
+					featureType: 'water',
+					stylers: [{color: '#3B7A94'}]
+				}
+			], {
+				name: 'Grey'
+			});
+			var customMapTypeId = 'custom_style';
+
+			var map = new google.maps.Map(document.getElementById('map'), {
+				zoom: 18,
+				center: {lat: pos.coords.latitude, lng: pos.coords.longitude},
+				mapTypeControlOptions: {
+					mapTypeIds: [google.maps.MapTypeId.ROADMAP, customMapTypeId]
+				}
+			});
+
+			map.mapTypes.set(customMapTypeId, customMapType);
+			map.setMapTypeId(customMapTypeId);
+		}
+
+		$scope.init = function() {
+			//$scope.pageParams.busy = true;
+			//$scope.pageParams.offline = false;
+			if(!$scope.user) {
+				return;
+			}
+
+			if (navigator.geolocation) {
+				navigator.geolocation.getCurrentPosition($scope.initMap);
+			} else {
+				x.innerHTML = "Geolocation is not supported by this browser.";
+			}
+
+			//api.user.get({
+			//	name: $scope.user.name
+			//}, function(user) {
+			//	$scope.pageParams.busy = false;
+			//}, function(error) {
+			//	$scope.pageParams.busy = false;
+			//	$scope.pageParams.offline = true;
+			//})
+		};
+
+		$scope.$watch("user", $scope.init);
 	});
 angular.module("app")
 	.controller("NavigationCtrl", function($scope) {
@@ -304,6 +417,22 @@ angular.module("app")
 			});
 		};
 	});
+angular.module("app")
+    .directive("globalStats", function() {
+        return {
+            templateUrl: "/views/common/global_stats.html",
+            scope: {stats: "=globalStats"},
+            controller: function($scope, api) {
+                $scope.selectItem = function(item) {
+                    //todo: get item list
+                    $scope.activeItem = {
+                        title: item.data.title,
+                        data: []
+                    }
+                };
+            }
+        }
+    });
 angular.module("app")
 	.directive("navigation", function() {
 		return {
@@ -453,4 +582,10 @@ angular.module("app")
         };
 
         return notify;
+    });
+angular.module("app")
+    .filter("date", function() {
+        return function(input) {
+            return moment(input).format("DD/MM/YY");
+        }
     });

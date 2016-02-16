@@ -1,0 +1,32 @@
+.stats-wrapper {
+  .stats-header {
+    padding: 35px 20px;
+
+    background-color: #EEE;
+
+    .item {
+     opacity: 0.5;
+
+     &:hover {
+       opacity: 1;
+     }
+
+     .count {
+       font-size: 70px;
+       padding: 0 10px;
+     }
+
+     .details {
+       margin-top: 30px;
+     }
+
+     .title {
+       font-size: 18px;
+     }
+
+     .date {
+       font-size: 16px;
+     }
+    }
+  }
+}

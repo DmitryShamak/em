@@ -1,6 +1,20 @@
 angular.module("app")
-	.controller("LogInCtrl", function($rootScope, $scope, $state, api) {
-		$scope.userData = {};
+	.controller("LogInCtrl", function($rootScope, $scope, $state, $window, api) {
+		$scope.sources = [{
+			name: "Google+",
+			key: "google"
+		}, {
+			name: "Instagram",
+			key: "instagram"
+		}, {
+			name: "Facebook",
+			key: "facebook"
+		}];
+
+		$scope.authWith = function(source) {
+			var path = "/auth/" + source;
+			$window.location.href = path;
+		};
 		
 		$scope.logIn = function(userData) {
 			if($scope.busy) {

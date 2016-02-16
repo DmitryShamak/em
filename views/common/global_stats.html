@@ -1,0 +1,19 @@
+<div class="stats-wrapper">
+    <div class="stats-header row">
+        <div class="item pointer col-xs-12 col-sm-6 col-md-3 clearfix" ng-repeat="item in stats | orderBy:item.priority" ng-click="selectItem(item);">
+            <h5 class="count pull-left" ng-bind="item.data.count"></h5>
+            <div class="details text-left pull-left">
+                <div class="title" ng-bind="item.data.title"></div>
+                <div class="date" ng-bind="item.data.date | date"></div>
+            </div>
+        </div>
+    </div>
+    <div class="stats-content col-xs-12">
+        <h3 ng-bind="activeItem.title"></h3>
+        <div class="list-wrapper">
+            <div class="item" ng-repeat="item in activeItem.data">
+                <h4 ng-bind="item.title"></h4>
+            </div>
+        </div>
+    </div>
+</div>

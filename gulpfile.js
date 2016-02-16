@@ -7,20 +7,22 @@ var notify = require('gulp-notify');
 var del = require('del');
 var livereload = require('gulp-livereload');
 var path = require("path");
-var minifyCSS = require('gulp-minify-css');
-var less = require("gulp-less");
+var minifyCss = require('gulp-minify-css');
+var sass = require('gulp-sass');
 var util = require("gulp-util");
 
 var stylesSrc = [
-    '/public/styles/*.less'
+    'public/styles/*.scss'
 ];
-gulp.task("styles", function() {
-    return gulp.src(stylesSrc)
-        .pipe(less({
-            paths: [ path.join(__dirname, 'less', 'includes') ]
-        }))
-        .on('error', util.log)
-        .pipe(gulp.dest('./dist/css'));
+gulp.task('styles', function () {
+    return gulp
+        // Find all `.scss` files from the `stylesheets/` folder
+        .src(stylesSrc)
+        // Run Sass on those files
+        .pipe(sass())
+        .pipe(concat('style.css'))
+        // Write the resulting CSS in the output folder
+        .pipe(gulp.dest('dist/css'));
 });
 
 var scriptsSrc = [
@@ -51,7 +53,7 @@ gulp.task('watch', function() {
     //gulp.watch(['dist/**']).on('change', livereload.changed);
 
     // Watch .less files
-    //gulp.watch('public/styles/**/*.less', ['styles']);
+    gulp.watch('public/styles/*.scss', ['styles']);
     // Watch .js files
     gulp.watch('public/scripts/**/*.js', ['scripts']);
     // Watch image files
@@ -61,5 +63,5 @@ gulp.task('watch', function() {
 
 // Default task
 gulp.task('default', ['clean'], function() {
-    gulp.start('scripts');
+    gulp.start('scripts', 'styles');
 });

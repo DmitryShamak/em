@@ -29,7 +29,7 @@ function config($stateProvider, $urlRouterProvider, $locationProvider) {
           },
           controller: function($rootScope, $state) {
             $rootScope.user = null;
-            document.cookie = null;
+            document.cookie = "expired";
             $state.go("login");
           }
         })
@@ -49,6 +49,14 @@ function config($stateProvider, $urlRouterProvider, $locationProvider) {
             },
             controller: "ProfileCtrl"
         })
+        .state('map', {
+            url: "/map",
+            templateUrl: "/views/map.html",
+            data: {
+                pageTitle: 'My Map'
+            },
+            controller: "MapCtrl"
+        })
         .state('join', {
           url: "/join/:id",
           templateUrl: "/views/scoreboard.html",
@@ -62,15 +70,9 @@ function config($stateProvider, $urlRouterProvider, $locationProvider) {
 angular
   .module('app')
   .config(config)
-  .run(function($rootScope, $state, $injector, $location) {
+  .run(function($rootScope, $state, $window, $location) {
     $rootScope.getToken = function() {
-        var cookie = document.cookie.split(";");
-        var token;
-        _.forEach(cookie, function(item) {
-            if(item.charAt(0) == ' ') {
-                token = item.substring(1);
-            }
-        });
+        return $.cookie("user");
 
         return token;
     };
@@ -81,27 +83,17 @@ angular
 
     $rootScope.checkAuthentication = function() {
         if(!$rootScope.user) {
-            $rootScope.busy = false;
-            var api = $injector.get('api');
             var token = $rootScope.getToken();
             if(!token) {
-                $state.go("login");
+                return $state.go("login");
             }
-            $rootScope.busy = true;
-            api.authenticate.save({token: token}, function(user) {
-                $rootScope.user = user;
-                var state = $state.current.name;
-
-                if(state === "login") {
-                    $rootScope.redirectToMainPage();
-                } else {
-                    $state.go(state);
-                }
-                $rootScope.busy = false;
-            }, function(err) {
-                $state.go("login");
-                $rootScope.busy = false;
-            });
+            $rootScope.user = JSON.parse(token);
+            var state = $state.current.name || $window.location.pathname.substring(1);
+            if(!state || state === "login") {
+                $window.location.href = "/landing";
+            } else {
+                $state.go(state);
+            }
         }
     };
 

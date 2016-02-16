@@ -1,6 +1,8 @@
 'use strict';
 var express = require("express");
+var session = require("express-session");
 var bodyParser = require("body-parser");
+var cookieParser = require("cookie-parser");
 var path = require("path");
 
 var app = express();
@@ -11,6 +13,12 @@ var staticRoot = path.join(rootPath);
 
 
 app.use(bodyParser.json());
+app.use(cookieParser());
+app.use(session({
+    secret: "oldmansecret",
+    resave: true,
+    saveUninitialized: false
+}));
 app.use(bodyParser.urlencoded({
     extended: true
 }));

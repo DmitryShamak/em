@@ -1,0 +1,7 @@
+@import "conf";
+
+#map {
+  position: fixed !important;
+  top: 0; bottom: 0;
+  left: $navigationWidth; right: 0;
+}
