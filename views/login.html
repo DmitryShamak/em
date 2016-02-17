@@ -1,9 +1,12 @@
-<div class="col-xs-8 col-xs-offset-1 col-md-4 col-md-offset-4">
-	<h3 class="form-group">Log in with one of next systems</h3>
+<div navigation></div>
+<div class="page-wrapper animated fadeIn clearfix">
+	<div class="col-xs-8 col-xs-offset-1 col-md-4 col-md-offset-4">
+		<h3 class="form-group">Log in with one of next systems</h3>
 
-	<div class="sources-list">
-		<div ng-repeat="source in sources">
-			<div class="source" ng-click="authWith(source.key);" ng-bind="source.name"></div>
+		<div class="sources-list">
+			<div ng-repeat="source in sources">
+				<div class="source" ng-click="authWith(source.key);" ng-bind="source.name"></div>
+			</div>
 		</div>
 	</div>
 </div>

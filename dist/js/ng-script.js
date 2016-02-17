@@ -8,7 +8,7 @@
 function config($stateProvider, $urlRouterProvider, $locationProvider) {
     $locationProvider.html5Mode(true);
 
-    $urlRouterProvider.otherwise("/login");
+    $urlRouterProvider.otherwise("/landing");
 
     jQuery.ajaxSetup({cache: true});
 
@@ -21,25 +21,6 @@ function config($stateProvider, $urlRouterProvider, $locationProvider) {
           },
           controller: "SignUpCtrl"
         })
-        .state('login', {
-          url: "/login",
-          templateUrl: "/views/login.html",
-          data: {
-           pageTitle: 'LogIn'
-          },
-          controller: "LogInCtrl"
-        })
-        .state('logout', {
-          url: "/logout",
-          data: {
-           pageTitle: 'Log Out'
-          },
-          controller: function($rootScope, $state) {
-            $rootScope.user = null;
-            document.cookie = "expired";
-            $state.go("login");
-          }
-        })
         .state('landing', {
           url: "/landing",
           templateUrl: "/views/landing.html",
@@ -47,6 +28,14 @@ function config($stateProvider, $urlRouterProvider, $locationProvider) {
            pageTitle: 'Landing'
           },
           controller: "LandingCtrl"
+        })
+        .state('home', {
+            url: "/home",
+            templateUrl: "/views/home.html",
+            data: {
+                pageTitle: 'Home'
+            },
+            controller: "HomeCtrl"
         })
         .state('profile', {
             url: "/profile",
@@ -85,26 +74,43 @@ angular
     };
 
     $rootScope.redirectToMainPage = function() {
-        $state.go("landing");
+        var state = $state.current.name || $window.location.pathname.substring(1);
+
+        if(state != "landing") {
+            return $window.location.href = "/landing";
+        }
+        $state.go(state);
+    };
+
+    $rootScope.logout = function() {
+        $window.location.href = "/logout";
     };
 
     $rootScope.checkAuthentication = function() {
+        var token = $rootScope.getToken();
+        var state = $state.current.name;
         if(!$rootScope.user) {
-            var token = $rootScope.getToken();
-            if(!token) {
-                return $state.go("login");
+            if(token && token != "undefined") {
+                $rootScope.user = JSON.parse(token);
             }
-            $rootScope.user = JSON.parse(token);
-            var state = $state.current.name || $window.location.pathname.substring(1);
-            if(!state || state === "login") {
-                $window.location.href = "/landing";
-            } else {
-                $state.go(state);
+
+            if(token && (!state)) {
+                $state.go("home");
             }
         }
     };
 
     $rootScope.checkAuthentication();
+    $rootScope.$on('$stateChangeStart', function() {
+        var token = $rootScope.getToken();
+        var state = $state.current.name;
+        if(!$rootScope.user && token && token != "undefined") {
+            $rootScope.user = JSON.parse(token);
+        } else if(!$rootScope.user && state && state != "landing") {
+            $window.location.href = "/landing";
+        }
+
+    });
 
     $rootScope.apply = function(scope) {
       if (scope.$root.$$phase != '$apply' && scope.$root.$$phase != '$digest') {
@@ -113,9 +119,9 @@ angular
     };
   });
 angular.module("app")
-	.controller("LandingCtrl", function($rootScope, $scope, $interval, $state, api) {
+	.controller("HomeCtrl", function($rootScope, $scope, $interval, $state, api) {
 		if(!$rootScope.user && !$rootScope.busy) {
-	      $state.go("login");
+	      $scope.redirectToMainPage();
 	    }
 
 		var dateNow = moment().toDate();
@@ -182,6 +188,24 @@ angular.module("app")
 	});
 
 angular.module("app")
+	.controller("LandingCtrl", function($rootScope, $scope, $interval, $state, api) {
+		var dateNow = moment().toDate();
+
+		$scope.pageParams = {};
+		$scope.pageData = {};
+
+		$scope.init = function() {
+			//$scope.pageParams.busy = true;
+			//$scope.pageParams.offline = false;
+			//if(!$scope.user) {
+			//	return;
+			//}
+		};
+
+		$scope.$watch("user", $scope.init);
+	});
+
+angular.module("app")
 	.controller("LogInCtrl", function($rootScope, $scope, $state, $window, api) {
 		$scope.sources = [{
 			name: "Google+",
@@ -226,6 +250,10 @@ angular.module("app")
 	});
 angular.module("app")
 	.controller("MapCtrl", function($rootScope, $scope, $state, api) {
+		if(!$rootScope.user && !$rootScope.busy) {
+			$scope.redirectToMainPage();
+		}
+
 		$scope.pageParams = {};
 		$scope.pageData = {};
 
@@ -291,16 +319,30 @@ angular.module("app")
 		$scope.$watch("user", $scope.init);
 	});
 angular.module("app")
-	.controller("NavigationCtrl", function($scope) {
+	.controller("NavigationCtrl", function($scope, $window) {
 		$scope.updateNotificationCount = function() {
 			$scope.notificationsCount = 0;
+		};
+		$scope.sources = [{
+			name: "Google+",
+			key: "google"
+		}];
+
+		$scope.authWith = function(source) {
+			var path = "/auth/" + source;
+			$window.location.href = path;
 		};
 
 		$scope.navigation = {};
 		var topLinks = {};
 		topLinks.landing = {
+			title: "Landing",
+			state: "landing",
+			icon: "fa-info"
+		};
+		topLinks.home = {
 			title: "Home",
-				state: "landing",
+				state: "home",
 				icon: "fa-home",
 				value: $scope.notificationsCount || 0
 		};
@@ -315,11 +357,29 @@ angular.module("app")
 
 		var bottomLinks = {};
 
-		bottomLinks.logout = {
-			title: "Log Out",
-			state: "logout",
+		//todo: add contacts page
+		bottomLinks.landing = {
+			title: "Landing",
+			actstate: "landing",
 			icon: "fa-sign-out"
 		};
+		if($scope.user) {
+			bottomLinks.logout = {
+				title: "Log Out",
+				action: $scope.logout,
+				icon: "fa-sign-out"
+			};
+		} else {
+			_.forEach($scope.sources, function(source) {
+				bottomLinks[source.name] = {
+					title: "Sign In with " + source.name,
+					action: function() {
+						$scope.authWith(source.key);
+					},
+					icon: "fa-" + source.key
+				};
+			});
+		}
 		$scope.navigation.bottomLinks = bottomLinks;
 
 		//update history link
@@ -327,7 +387,7 @@ angular.module("app")
 angular.module("app")
     .controller("ProfileCtrl", function($rootScope, $scope, $interval, $state, api) {
         if(!$rootScope.user && !$rootScope.busy) {
-            $state.go("login");
+            $scope.redirectToMainPage();
         }
 
         var UserProfile = function(attrs) {

@@ -6,12 +6,14 @@ var passport = require("./passport.js");
 
 function isLoggedIn(req, res, next) {
     // if user is authenticated in the session, carry on
-    if (req.isAuthenticated())
+    if (req.isAuthenticated() && req.user)
         res.cookie('user', JSON.stringify(req.user));
         return next();
 
     // if they aren't redirect them to the home page
-    res.redirect('/');
+    var url = req.originalUrl.substring(1);
+    var redirectUrl = url === "landing" ? url : "landing";
+    res.redirect('/' + redirectUrl);
 }
 
 var router = function(app) {
@@ -20,8 +22,10 @@ var router = function(app) {
     app.put('/api/user', user.update);
 
     app.all("/logout", function(req, res, next) {
-       req.logout();
-       res.redirect("/");
+        res.cookie("user", "", { expires: new Date(), path: '/'});
+        req.logout();
+        req.session.destroy();
+        res.redirect("/landing");
     });
 
     //OAuth
@@ -34,8 +38,8 @@ var router = function(app) {
         next();
     });
     app.get('/auth/google/callback', passport.authenticate("google", {
-            successRedirect: "/landing",
-            failureRedirect: "/login"
+            successRedirect: "/home",
+            failureRedirect: "/landing"
         })
     );
 

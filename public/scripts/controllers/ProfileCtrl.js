@@ -1,7 +1,7 @@
 angular.module("app")
     .controller("ProfileCtrl", function($rootScope, $scope, $interval, $state, api) {
         if(!$rootScope.user && !$rootScope.busy) {
-            $state.go("login");
+            $scope.redirectToMainPage();
         }
 
         var UserProfile = function(attrs) {

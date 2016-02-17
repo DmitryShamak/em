@@ -20,7 +20,11 @@ passport.use(new GoogleStrategy(oauthConfig.googleAuth,
         //User.findOrCreate({ openId: identifier }, function(err, user) {
         //    done(err, user);
         //});
+
         var user = {
+            id: profile.id,
+            photos: profile.photos,
+            provider: profile.provider,
             email: profile.emails[0].value,
             name: profile.displayName,
             token: accessToken
@@ -35,7 +39,7 @@ passport.use(new GoogleStrategy(oauthConfig.googleAuth,
         //    }
         //    console.log("Source", data);
         //});
-        console.log(user);
+        console.log(profile);
         done(null, user);
     }
 ));

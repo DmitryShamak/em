@@ -1,7 +1,7 @@
 function config($stateProvider, $urlRouterProvider, $locationProvider) {
     $locationProvider.html5Mode(true);
 
-    $urlRouterProvider.otherwise("/login");
+    $urlRouterProvider.otherwise("/landing");
 
     jQuery.ajaxSetup({cache: true});
 
@@ -14,25 +14,6 @@ function config($stateProvider, $urlRouterProvider, $locationProvider) {
           },
           controller: "SignUpCtrl"
         })
-        .state('login', {
-          url: "/login",
-          templateUrl: "/views/login.html",
-          data: {
-           pageTitle: 'LogIn'
-          },
-          controller: "LogInCtrl"
-        })
-        .state('logout', {
-          url: "/logout",
-          data: {
-           pageTitle: 'Log Out'
-          },
-          controller: function($rootScope, $state) {
-            $rootScope.user = null;
-            document.cookie = "expired";
-            $state.go("login");
-          }
-        })
         .state('landing', {
           url: "/landing",
           templateUrl: "/views/landing.html",
@@ -40,6 +21,14 @@ function config($stateProvider, $urlRouterProvider, $locationProvider) {
            pageTitle: 'Landing'
           },
           controller: "LandingCtrl"
+        })
+        .state('home', {
+            url: "/home",
+            templateUrl: "/views/home.html",
+            data: {
+                pageTitle: 'Home'
+            },
+            controller: "HomeCtrl"
         })
         .state('profile', {
             url: "/profile",
@@ -78,26 +67,43 @@ angular
     };
 
     $rootScope.redirectToMainPage = function() {
-        $state.go("landing");
+        var state = $state.current.name || $window.location.pathname.substring(1);
+
+        if(state != "landing") {
+            return $window.location.href = "/landing";
+        }
+        $state.go(state);
+    };
+
+    $rootScope.logout = function() {
+        $window.location.href = "/logout";
     };
 
     $rootScope.checkAuthentication = function() {
+        var token = $rootScope.getToken();
+        var state = $state.current.name;
         if(!$rootScope.user) {
-            var token = $rootScope.getToken();
-            if(!token) {
-                return $state.go("login");
+            if(token && token != "undefined") {
+                $rootScope.user = JSON.parse(token);
             }
-            $rootScope.user = JSON.parse(token);
-            var state = $state.current.name || $window.location.pathname.substring(1);
-            if(!state || state === "login") {
-                $window.location.href = "/landing";
-            } else {
-                $state.go(state);
+
+            if(token && (!state)) {
+                $state.go("home");
             }
         }
     };
 
     $rootScope.checkAuthentication();
+    $rootScope.$on('$stateChangeStart', function() {
+        var token = $rootScope.getToken();
+        var state = $state.current.name;
+        if(!$rootScope.user && token && token != "undefined") {
+            $rootScope.user = JSON.parse(token);
+        } else if(!$rootScope.user && state && state != "landing") {
+            $window.location.href = "/landing";
+        }
+
+    });
 
     $rootScope.apply = function(scope) {
       if (scope.$root.$$phase != '$apply' && scope.$root.$$phase != '$digest') {

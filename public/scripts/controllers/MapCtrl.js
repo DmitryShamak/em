@@ -1,5 +1,9 @@
 angular.module("app")
 	.controller("MapCtrl", function($rootScope, $scope, $state, api) {
+		if(!$rootScope.user && !$rootScope.busy) {
+			$scope.redirectToMainPage();
+		}
+
 		$scope.pageParams = {};
 		$scope.pageData = {};
 
