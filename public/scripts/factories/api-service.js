@@ -20,7 +20,7 @@ angular.module("app")
         api.source = $resource("/api/source", null, {
             'update': { method:'PUT' }
         });
-        api.search = $resource("/api/search");
+        api.scraper = $resource("/api/scraper");
 
         return api;
     });

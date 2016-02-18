@@ -7,12 +7,10 @@
 
 html,
 body {
-	height: 100%;
+	min-height: 100%;
 	width: 100%;
 
   	font-size: 16px;
-
-	overflow: hidden;
 }
 
 h5 {
@@ -33,6 +31,10 @@ h1 {
 
 .pointer {
   cursor: pointer;
+}
+
+.disabled {
+  pointer-events: none;
 }
 
 .page-wrapper {
@@ -95,11 +97,16 @@ h1 {
 		}
 
 		&.user-profile {
+		  min-height: 70px;
 		  padding: 10px 0;
 		  line-height: 1em;
 		  border: 0;
 		  border-radius: 0;
 		  white-space: normal;
+
+		  img {
+			border-radius: 50px;
+		  }
 
 
 		  .profile-icon {

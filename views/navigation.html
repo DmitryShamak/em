@@ -3,7 +3,8 @@
 		<div class="navigation-group" ng-hide="!user">
 			<div class="navigation-link user-profile btn"
 			   ui-sref="profile" ui-sref-active="selected" title="profile: {{user.name}}">
-				<i class="profile-icon fa fa-user"></i>
+				<i class="profile-icon fa fa-user" ng-hide="user.photos.length"></i>
+				<img ng-hide="!user.photos.length" ng-src="{{user.photos[0].value}}">
 			</div>
 		</div>
 		<div class="navigation-group" ng-hide="!user">

@@ -2,25 +2,19 @@
 <div class="page-wrapper animated fadeIn clearfix">
 	<div class="row" ng-hide="pageParams.busy">
 		<div class="col-xs-12" ng-hide="pageParams.offline">
-			<h1>Landing</h1>
-			<p>
-				Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque tempor, est at accumsan lacinia, ex metus pellentesque eros,
-				malesuada tempus dui leo non velit. Quisque volutpat nisl sit amet justo blandit, quis accumsan ipsum sodales. Morbi vitae nunc
-				mattis, vestibulum justo vel, euismod augue. Nulla facilisi. In pellentesque vehicula ex, in semper mi. Curabitur sed nunc nec erat
-				placerat bibendum ultricies id sem. Vivamus eu magna quis purus iaculis malesuada ut eu felis. Sed auctor malesuada libero suscipit porta.
-				Nunc efficitur sapien quis tristique blandit. Pellentesque pharetra erat metus, non convallis nulla iaculis eget.
-			</p>
-			<p>
-				Sed scelerisque laoreet massa, ac sagittis lacus elementum consequat. Etiam enim ipsum, fermentum non molestie a, tempor at nulla.
-				Cras egestas blandit varius. Quisque quam lectus, congue in sem sed, euismod porttitor justo. Integer porttitor, augue ac laoreet rutrum,
-				risus erat scelerisque diam, vitae laoreet odio sem quis dui. Morbi sit amet lectus maximus, sodales dui ut, sagittis neque.
-			</p>
-			<p>
-				Mauris eget lectus et justo fermentum convallis. In diam diam, facilisis non dignissim ac, viverra nec ipsum. Maecenas vel dolor aliquet,
-				pretium orci sit amet, consequat nisl. Phasellus sodales blandit ante, quis porttitor augue pulvinar vel. Vivamus pulvinar, libero
-				quis suscipit malesuada, augue nibh volutpat nibh, sit amet commodo arcu purus quis arcu. Donec ut est id turpis posuere viverra quis sit
-				amet nisl. Nunc facilisis vulputate vestibulum. Duis luctus a nisl ut dapibus. In mattis sem a dignissim vulputate.
-			</p>
+			<h1>Updates</h1>
+			<div class="row">
+				<div class="col-xs-12 col-md-6" ng-repeat="item in page.updates">
+					<div class="landing-item">
+						<div class="item-image" ng-style="item.style"></div>
+						<h3>
+							{{item.title}}
+							<small ng-bind="item.date | date"></small>
+						</h3>
+						<div ng-bind="item.content"></div>
+					</div>
+				</div>
+			</div>
 		</div>
 	</div>
 	<p class="form-group alert alert-info" ng-hide="!pageParams.busy"><i class="fa fa-refresh fa-pulse"></i> in progress..</p>

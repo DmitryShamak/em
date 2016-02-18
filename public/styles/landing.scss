@@ -1,0 +1,15 @@
+.landing-item {
+  margin: 15px 0;
+  padding: 0 15px 15px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+
+  .item-image {
+    height: 125px;
+    margin: 0 -15px;
+
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-color: #000;
+    background-position: center;
+  }
+}

@@ -125,44 +125,45 @@ angular.module("app")
 	    }
 
 		var dateNow = moment().toDate();
+		var Statistic = function(attrs, busy) {
+			var self = this;
+
+			self.busy = busy;
+			self.priority = attrs.priority;
+			self.type = attrs.type;
+			self.data = {
+				count: 0,
+				title: attrs.type.toUpperCase(),
+				date: attrs.date || dateNow
+			};
+		};
 
 		$scope.pageParams = {};
-		$scope.pageData = {};
+		$scope.page = {};
 
 		$scope.initStats = function(stats) {
-			$scope.pageData.stats = [];
-			$scope.pageData.stats.push({
+			$scope.page.stats = [];
+			$scope.page.stats.push(new Statistic({
 				priority: 0,
-				data: {
-					count: 0,
-					title: "News",
-					date: dateNow
-				}
-			});
-			$scope.pageData.stats.push({
-				priority: 1,
-				data: {
-					count: 0,
-					title: "Events",
-					date: dateNow
-				}
-			});
-			$scope.pageData.stats.push({
-				priority: 2,
-				data: {
-					count: 0,
-					title: "Messages",
-					date: dateNow
-				}
-			});
-			$scope.pageData.stats.push({
-				priority: 3,
-				data: {
-					count: 0,
-					title: "Notifications",
-					date: dateNow
-				}
-			});
+				type: "news"
+			}, true));
+			$scope.page.stats.push(new Statistic({
+				priority: 0,
+				type: "events"
+			}, true));
+			//$scope.pageData.stats.push({
+			//	priority: 2,
+			//	type: "",
+			//	data: {
+			//		count: 0,
+			//		title: "Messages",
+			//		date: dateNow
+			//	}
+			//});
+			$scope.page.stats.push(new Statistic({
+				priority: 0,
+				type: "notifications"
+			}, true));
 		};
 
 		$scope.init = function() {
@@ -173,6 +174,17 @@ angular.module("app")
 			}
 
 			$scope.initStats({});
+			//News block
+			var news = _.find($scope.page.stats, {type: "news"});
+			api.scraper.save({
+				providers: ["onliner"]
+			}, function(data) {
+				news.data.count = data.onliner.totalCount;
+				news.busy = false;
+			}, function(err) {
+				console.info(err);
+				news.busy = false;
+			});
 
 			api.user.get({
 				name: $scope.user.name
@@ -188,18 +200,33 @@ angular.module("app")
 	});
 
 angular.module("app")
-	.controller("LandingCtrl", function($rootScope, $scope, $interval, $state, api) {
+	.controller("LandingCtrl", function($rootScope, $scope, $interval, $state, $filter, api) {
 		var dateNow = moment().toDate();
 
 		$scope.pageParams = {};
-		$scope.pageData = {};
+		$scope.page = {};
 
 		$scope.init = function() {
-			//$scope.pageParams.busy = true;
-			//$scope.pageParams.offline = false;
-			//if(!$scope.user) {
-			//	return;
-			//}
+			$scope.pageParams.busy = true;
+			$scope.pageParams.offline = false;
+
+			$scope.page.updates = [];
+			for(var i=0; i<5; i++) {
+				var imageInd = Math.floor(Math.random()*5);
+				$scope.page.updates.push({
+					title: "Lorem ipsum dolor sit",
+					date: moment().toDate(),
+					content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque tempor, est at accumsan lacinia, ex metus pellentesque eros," +
+					"malesuada tempus dui leo non velit. Quisque volutpat nisl sit amet justo blandit, quis accumsan ipsum sodales. Morbi vitae nunc " +
+					"mattis, vestibulum justo vel, euismod augue. Nulla facilisi. In pellentesque vehicula ex, in semper mi.",
+					style: {
+						'backgroundImage': 'url(/public/imgs/default_img_'+imageInd+'.jpg)'
+					}
+				});
+			}
+
+			$scope.pageParams.busy = false;
+			$scope.pageParams.offline = false;
 		};
 
 		$scope.$watch("user", $scope.init);
@@ -257,6 +284,25 @@ angular.module("app")
 		$scope.pageParams = {};
 		$scope.pageData = {};
 
+		// Adds a marker to the map.
+		var labels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+		var labelIndex = 0;
+		$scope.addMarker = function(location, map) {
+			var image = {
+				url: '/public/imgs/user_marker.png', // url
+				scaledSize: new google.maps.Size(50, 50), // scaled size
+				origin: new google.maps.Point(0,0), // origin
+				anchor: new google.maps.Point(25, 50) // anchor
+			};
+			// Add the marker at the clicked location, and add the next-available label
+			// from the array of alphabetical characters.
+			var marker = new google.maps.Marker({
+				position: location,
+				//icon: image,
+				map: map
+			});
+		};
+
 		$scope.initMap = function(pos) {
 			var customMapType = new google.maps.StyledMapType([
 				{
@@ -280,18 +326,36 @@ angular.module("app")
 				name: 'Grey'
 			});
 			var customMapTypeId = 'custom_style';
+			var currentPosition = {lat: pos.coords.latitude, lng: pos.coords.longitude};
 
-			var map = new google.maps.Map(document.getElementById('map'), {
-				zoom: 18,
-				center: {lat: pos.coords.latitude, lng: pos.coords.longitude},
+			$scope.map = new google.maps.Map(document.getElementById('map'), {
+				zoom: 17,
+				center: currentPosition,
 				mapTypeControlOptions: {
 					mapTypeIds: [google.maps.MapTypeId.ROADMAP, customMapTypeId]
 				}
 			});
 
-			map.mapTypes.set(customMapTypeId, customMapType);
-			map.setMapTypeId(customMapTypeId);
-		}
+			$scope.map.mapTypes.set(customMapTypeId, customMapType);
+			$scope.map.setMapTypeId(customMapTypeId);
+
+			// This event listener calls addMarker() when the map is clicked.
+			//google.maps.event.addListener($scope.map, 'click', function(event) {
+			//	$scope.addMarker(event.latLng, $scope.map);
+			//});
+
+			// Add a marker at the center of the map.
+			$scope.addMarker(currentPosition, $scope.map);
+
+			//map.addMarker({
+			//	lat:  pos.coords.latitude,
+			//	lng:  pos.coords.longitude,
+			//	title: 'Lima',
+			//	click: function(e) {
+			//		alert('You clicked in this marker');
+			//	}
+			//});
+		};
 
 		$scope.init = function() {
 			//$scope.pageParams.busy = true;
@@ -550,7 +614,7 @@ angular.module("app")
         api.source = $resource("/api/source", null, {
             'update': { method:'PUT' }
         });
-        api.search = $resource("/api/search");
+        api.scraper = $resource("/api/scraper");
 
         return api;
     });

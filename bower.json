@@ -32,6 +32,8 @@
     "satellizer": "~0.13.4",
     "angular-google-maps": "~2.3.2",
     "angular-simple-logger": "~0.1.7",
-    "jquery.cookie": "jquery-cookie#~1.4.1"
+    "jquery.cookie": "jquery-cookie#~1.4.1",
+    "leaflet": "~0.7.7",
+    "gmaps": "~0.4.22"
   }
 }
