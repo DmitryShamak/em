@@ -177,9 +177,14 @@ angular.module("app")
 			//News block
 			var news = _.find($scope.page.stats, {type: "news"});
 			api.scraper.save({
-				providers: ["onliner"]
-			}, function(data) {
-				news.data.count = data.onliner.totalCount;
+				providers: ["tech.onliner"]
+			}, function(data, next) {
+				news.data.totalCount = data.totalCount;
+				news.data.content = _.map(data.list, function(value, key) {
+					var data = value;
+					data.title = key;
+					return data;
+				});
 				news.busy = false;
 			}, function(err) {
 				console.info(err);
@@ -193,7 +198,15 @@ angular.module("app")
 			}, function(error) {
 				$scope.pageParams.busy = false;
 				$scope.pageParams.offline = true;
-			})
+			});
+
+			//Events
+			var events = _.find($scope.page.stats, {type: "events"});
+			events.busy = false;
+
+			//Notifications
+			var notifications = _.find($scope.page.stats, {type: "notifications"});
+			notifications.busy = false;
 		};
 
 		$scope.$watch("user", $scope.init);
@@ -548,12 +561,24 @@ angular.module("app")
             scope: {stats: "=globalStats"},
             controller: function($scope, api) {
                 $scope.selectItem = function(item) {
-                    //todo: get item list
+                    //clear previous active status
+                    var currentActive = _.find($scope.stats, {active: true});
+                    if(currentActive) {
+                        currentActive.active = false;
+                    }
+                    //set current item active
+                    item.active = true;
+
                     $scope.activeItem = {
+                        hasData: item.data.totalCount > 0,
                         title: item.data.title,
-                        data: []
+                        data: item.data.content
                     }
                 };
+
+                $scope.toggleItem = function(item) {
+                    item.active = !item.active;
+                }
             }
         }
     });

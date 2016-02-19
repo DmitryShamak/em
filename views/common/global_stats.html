@@ -1,22 +1,51 @@
 <div class="stats-wrapper">
     <div class="stats-header row">
-        <div class="item pointer col-xs-12 col-sm-6 col-md-3 clearfix" ng-repeat="item in stats | orderBy:item.priority"  ng-class="{disabled: item.busy}" ng-click="selectItem(item);">
-            <h5 ng-if-start="!item.busy" class="count pull-left" ng-bind="item.data.count"></h5>
+        <div class="item pointer col-xs-4 clearfix" ng-repeat="item in stats | orderBy:item.priority"
+             ng-class="{'disabled': item.busy, 'active': item.active}" ng-click="selectItem(item);">
+            <h5 ng-if-start="!item.busy" class="count pull-left" ng-bind="item.data.totalCount || 0"></h5>
             <div ng-if-end class="details text-left pull-left">
                 <div class="title" ng-bind="item.data.title"></div>
                 <div class="date" ng-bind="item.data.date | date"></div>
             </div>
 
-            <div class="progress-wrapper" ng-if="item.busy">
+            <div class="progress-wrapper text-center" ng-if="item.busy">
                 <i class="fa fa-refresh fa-pulse"></i>
             </div>
         </div>
     </div>
-    <div class="stats-content col-xs-12">
-        <h3 ng-bind="activeItem.title"></h3>
+    <div class="stats-content clearfix">
         <div class="list-wrapper">
-            <div class="item" ng-repeat="item in activeItem.data">
-                <h4 ng-bind="item.title"></h4>
+            <div class="alert alert-info" ng-hide="!activeItem || activeItem.hasData">
+                No data
+            </div>
+            <div class="item" ng-hide="!activeItem.hasData" ng-repeat="item in activeItem.data">
+                <h4 ng-click="toggleItem(item);">
+                    [{{item.totalCount}} ] {{item.title}}
+                    <div class="btn">
+                        <span ng-bind="item.active ? 'hide' : 'show'"></span>
+                        <i class="fa" ng-class="{'fa-angle-down': !item.active, 'fa-angle-up': item.active}"></i>
+                    </div>
+                </h4>
+                <div class="animated fadeIn item-content row" ng-hide="!item.active">
+                    <div class="col-xs-12 col-md-6" ng-repeat="contentItem in item.content">
+                        <div class="list-item row">
+                            <div class="list-item-image col-xs-5 col-sm-4 col-md-3" ng-style="{'background-image': 'url('+contentItem.image+')'}"></div>
+                            <div class="list-item-content pull-right col-xs-7 col-sm-8 col-md-9">
+                                <h5 class="cutted-text" title="{{contentItem.title}}" ng-bind="contentItem.title"></h5>
+                                <a ng-href="{{contentItem.link}}" title="Link to original source" target="_blank">
+                                    {{contentItem.date | date}}
+                                    <i class="fa fa-angle-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xs-12">
+                        <div class="btn" ng-click="toggleItem(item);">
+                            <span>hide</span>
+                            <i class="fa fa-angle-up"></i>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

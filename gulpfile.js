@@ -25,6 +25,11 @@ gulp.task('styles', function () {
         .pipe(gulp.dest('dist/css'));
 });
 
+function onError(err) {
+    util.log(err);
+    gulp.start('watch');
+};
+
 var scriptsSrc = [
     'public/scripts/app.js',
     'public/scripts/config.js',
@@ -32,9 +37,9 @@ var scriptsSrc = [
 ];
 gulp.task("scripts", function() {
     return gulp.src(scriptsSrc)
+        .on('error', onError)
         .pipe(concat('ng-script.js'))
         .pipe(gulp.dest('dist/js'))
-        .on('error', util.log)
         .pipe(rename({suffix: '.min'}))
         .pipe(uglify())
         .pipe(gulp.dest('dist/js'))

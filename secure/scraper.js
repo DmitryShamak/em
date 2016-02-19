@@ -1,28 +1,29 @@
 var request = require("request");
 var cheerio = require("cheerio");
+var _ = require('lodash');
 var scraper = {};
 
 var providers = {
-  "onliner": {
+  "tech.onliner": {
       url: "http://tech.onliner.by/",
       parser: function(query, body) {
           var $ = cheerio.load(body);
           var content = [];
           $(".g-middle .b-posts-1-item").each(function(elem) {
               var title = $(this).find("h3").text().trim();
-              var link = $(this).find("a").attr("href");
               var image = $(this).find("img").attr("src");
               var textBlock = $(this).find("p");
+              var link = textBlock.find("a:last-of-type").attr("href");
               textBlock.find("a").remove();
               var text = textBlock.text().trim();
-              var time = $(this).find("time").attr("datetime");
+              var date = $(this).find("time").attr("datetime");
 
               content.push({
                   title: title,
                   link: link,
                   image: image,
                   text: text,
-                  time: time
+                  date: date
               })
           });
           return {
@@ -44,12 +45,19 @@ scraper.get = function(provider, query, callback) {
     if(!providerParams) {
         return callback("No such provider.", null);
     }
-    var data = {};
+    var data = {
+        list: {}
+    };
 
     request({
         uri: providerParams.url
     }, function(error, response, body) {
-        data[provider] = providerParams.parser(query, body);
+        data.list[provider] = providerParams.parser(query, body);
+        var totalCount = 0;
+        _.forEach(data.list, function(value, key) {
+            totalCount += value.totalCount || 0;
+        });
+        data.totalCount = totalCount;
 
         callback(null, data);
     });

@@ -1,14 +1,31 @@
+@import "conf";
+
+$header-height: 165px;
+
 .stats-wrapper {
+  posution: relative;
+  height: 100%;
+
   .stats-header {
+    position: fixed;
+    top: 0; left: $navigationWidth; right: 0;
+
+    height: $header-height;
     padding: 35px 20px;
 
     background-color: #EEE;
+    color: #577B96;
 
     .item {
       opacity: 0.5;
 
-      &:hover {
+      &:hover,
+      &.active {
        opacity: 1;
+      }
+
+      &.active {
+        color: #000;
       }
 
       .count {
@@ -33,6 +50,41 @@
         font-size: 30px;
       }
 
+    }
+  }
+
+  .stats-content {
+    position: fixed;
+    top: $header-height; bottom: 0;
+    left: $navigationWidth; right: 0;
+
+    overflow: auto;
+
+    margin: 15px 0;
+    padding: 0 15px;
+
+    .item {
+      border-bottom: 1px solid rgba(0,0,0,0.1);
+    }
+
+    .list-item {
+      position: relative;
+      height: 80px;
+      margin: 10px 0;
+      padding: 10px;
+
+      overflow: hidden;
+
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      font-size: 0.8em;
+
+      .list-item-image {
+        position: absolute;
+        top: 0; bottom: 0; left: 0;
+
+        background-size: cover;
+        background-repeat: no-repeat;
+      }
     }
   }
 }
